@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SecureVault</title>
+  <meta name="description" content="SecureVault is a professional-grade desktop vault that protects sensitive files with modern encryption and quick access controls.">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spectral:wght@400;600&display=swap");
+
+    :root {
+      --bg: #0c0f14;
+      --bg-2: #0f1a2b;
+      --ink: #e6edf3;
+      --muted: #a8b3c2;
+      --accent: #29d3a6;
+      --accent-2: #4aa6ff;
+      --card: #111826;
+      --stroke: #223148;
+      --shadow: 0 18px 60px rgba(8, 16, 30, 0.4);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1a2940 0%, transparent 55%),
+                  radial-gradient(900px 500px at 90% 10%, #10253f 0%, transparent 50%),
+                  linear-gradient(180deg, var(--bg), var(--bg-2));
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 36px 20px 80px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35);
+      object-fit: cover;
+      background: rgba(17, 24, 38, 0.6);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 36px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 14px 0 16px;
+      font-size: clamp(36px, 4vw, 52px);
+      line-height: 1.05;
+    }
+
+    .lead {
+      font-family: "Spectral", serif;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0b0f14;
+      box-shadow: 0 12px 30px rgba(41, 211, 166, 0.25);
+    }
+
+    .btn-secondary {
+      border-color: var(--stroke);
+      color: var(--ink);
+      background: rgba(17, 24, 38, 0.7);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(74, 166, 255, 0.2);
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(18, 27, 43, 0.9), rgba(14, 20, 33, 0.95));
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -60px auto;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(41, 211, 166, 0.25), transparent 70%);
+      opacity: 0.7;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(13, 19, 31, 0.8);
+      border: 1px solid rgba(34, 49, 72, 0.8);
+    }
+
+    .metric h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .metric p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .section {
+      margin-top: 64px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      margin: 0 0 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 18px;
+      min-height: 160px;
+    }
+
+    .card h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .foot {
+      margin-top: 60px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--stroke);
+      padding-top: 20px;
+    }
+
+    .help-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      color: #0b0f14;
+      background: linear-gradient(135deg, #ffd166, #f18f01);
+      box-shadow: 0 10px 24px rgba(241, 143, 1, 0.35);
+      border: 1px solid rgba(255, 209, 102, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 12px;
+    }
+
+    .help-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(241, 143, 1, 0.45);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .hero {
+        animation: rise 700ms ease-out;
+      }
+
+      .card {
+        animation: fade 700ms ease-out;
+      }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <div class="brand">
+        <img class="brand-mark" src="../logo%20sv.ico" alt="SecureVault logo">
+        <span>SecureVault</span>
+      </div>
+      <div class="nav-links">
+    
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Secure Vault</div>
+        <h1>Your privacy, fortified.</h1>
+        <p class="lead">
+          SecureVault protects photos, videos, audio, and documents with offline-first,
+          military-grade encryption. No cloud and no tracking - your data stays local,
+          locked inside your personal vault.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://apps.microsoft.com/store/detail/9NK63L9638SH?cid=DevShareMWAPCS">Download SecureVault</a>
+          <a class="btn btn-secondary" href="#features">Explore features</a>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <h3>Zero-knowledge privacy</h3>
+            <p>Files are encrypted and stored locally, never uploaded to the cloud.</p>
+          </div>
+          <div class="metric">
+            <h3>Industry-standard crypto</h3>
+            <p>AES encryption with PBKDF2HMAC (SHA-256) key derivation.</p>
+          </div>
+          <div class="metric">
+            <h3>Offline-first</h3>
+            <p>Secure access even without an internet connection.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title">SecureVault desktop</h2>
+        <p class="lead">
+          A local digital safe for Windows 10 and 11 that encrypts, organizes, and
+          lets you view private media and documents without exposing them.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h4>Multi-factor local access</h4>
+            <p>Secure your vault with both a password and a unique pass code.</p>
+          </div>
+          <div class="card">
+            <h4>Smart categorization</h4>
+            <p>Files are organized into Images, Videos, Audio, and Documents.</p>
+          </div>
+          <div class="card">
+            <h4>Instant encryption</h4>
+            <p>Drag and drop files to encrypt them and safely remove originals.</p>
+          </div>
+          <div class="card">
+            <h4>Seamless viewing</h4>
+            <p>View encrypted files in-app with temporary in-memory decryption.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <h2 class="section-title">Why people choose SecureVault</h2>
+      <div class="grid">
+        <div class="card">
+          <h4>Easy restoration</h4>
+          <p>Restore decrypted files back to your PC with one click.</p>
+        </div>
+        <div class="card">
+          <h4>Credential control</h4>
+          <p>Update your password and passcode from the dashboard.</p>
+        </div>
+        <div class="card">
+          <h4>Local, private storage</h4>
+          <p>Your encrypted files live only on your device in secure_vault_data.</p>
+        </div>
+        <div class="card">
+          <h4>Modern interface</h4>
+          <p>A sleek cyber-dark dashboard built for comfort and clarity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="panel">
+        <h2 class="section-title">Ready to deploy?</h2>
+        <p class="lead">
+          Download SecureVault for Windows and keep your most important files in a
+          dedicated, secure environment.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://apps.microsoft.com/store/detail/9NK63L9638SH?cid=DevShareMWAPCS">Download SecureVault</a>
+          <span class="nav-links">Version packaged as MSIX for straightforward installation.</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <b><span>Published &amp; Developed by: NavonmeshDevelopers</span></b>
+      <a class="help-btn" href="mailto:assv04012011@gmail.com">Help</a>
+    </footer>
+  </div>
+</body>
+</html>
