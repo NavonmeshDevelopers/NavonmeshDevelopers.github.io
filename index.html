@@ -9,7 +9,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="Logo.png">
+  <script>
+    (function () {
+      var reducedMotion = false;
+      var introSeen = false;
+
+      try {
+        reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (error) {
+        reducedMotion = false;
+      }
+
+      try {
+        introSeen = window.localStorage.getItem('navonmesh-intro-seen') === '1';
+      } catch (error) {
+        introSeen = false;
+      }
+
+      document.documentElement.dataset.intro = reducedMotion || introSeen ? 'complete' : 'pending';
+    })();
+  </script>
   <style>
     :root {
       --bg: #071426;
@@ -45,6 +64,223 @@
         radial-gradient(circle at 94% 8%, rgba(49, 163, 255, 0.24) 0, transparent 30%),
         linear-gradient(160deg, #06101f 0%, #071426 45%, #0a1a31 100%);
       line-height: 1.6;
+    }
+
+    html[data-intro="pending"] body {
+      overflow: hidden;
+    }
+
+    .site-shell {
+      opacity: 1;
+      transform: none;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    html[data-intro="pending"] .site-shell {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    html.intro-exiting .site-shell {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    html[data-intro="complete"] .site-shell {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #02070f;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.65s ease, visibility 0.65s ease;
+    }
+
+    .intro-overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    html[data-intro="complete"] .intro-overlay {
+      display: none;
+    }
+
+    .intro-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      background: #02070f;
+    }
+
+    .intro-overlay::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.32) 100%),
+        radial-gradient(circle at center, rgba(16, 38, 66, 0.08), rgba(0, 0, 0, 0.18));
+      z-index: 1;
+    }
+
+    .intro-overlay::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(2, 7, 15, 0.08) 0%, rgba(2, 7, 15, 0.18) 100%);
+      z-index: 1;
+    }
+
+    .intro-panel {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 760px);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding: clamp(1.25rem, 3vw, 2.5rem);
+      padding-bottom: calc(clamp(1.25rem, 3vw, 2.5rem) + env(safe-area-inset-bottom, 0px));
+      text-align: center;
+      gap: 1rem;
+    }
+
+    .intro-copy {
+      margin-top: auto;
+      max-width: 48rem;
+      color: #f2f7ff;
+      text-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .intro-kicker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.42rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(3, 9, 17, 0.35);
+      color: rgba(244, 248, 255, 0.88);
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
+    }
+
+    .intro-title {
+      margin: 0 0 0.55rem;
+      font-size: clamp(2rem, 5vw, 3.9rem);
+      letter-spacing: -0.03em;
+    }
+
+    .intro-lede {
+      margin: 0 auto;
+      max-width: 34rem;
+      font-size: clamp(1rem, 2.4vw, 1.15rem);
+      color: rgba(241, 246, 255, 0.84);
+    }
+
+    .intro-actions {
+      margin-top: auto;
+      width: 100%;
+      display: grid;
+      gap: 0.9rem;
+      justify-items: center;
+      padding-bottom: clamp(0.35rem, 1vw, 0.7rem);
+    }
+
+    .intro-fallback {
+      display: none;
+      width: 100%;
+      justify-items: center;
+      gap: 0.75rem;
+    }
+
+    .intro-fallback.is-visible {
+      display: grid;
+    }
+
+    .intro-button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.95rem 1.4rem;
+      min-width: min(100%, 280px);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+    }
+
+    .intro-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .intro-button:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.95);
+      outline-offset: 3px;
+    }
+
+    .intro-button-primary {
+      color: #05203d;
+      background: linear-gradient(125deg, #f6fbff 0%, #b9f5ff 100%);
+      box-shadow: 0 14px 35px rgba(1, 10, 20, 0.3);
+    }
+
+    .intro-button-secondary {
+      color: #f7fbff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(10px);
+    }
+
+    .intro-status {
+      min-height: 1.25rem;
+      font-size: 0.92rem;
+      color: rgba(234, 243, 255, 0.82);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
     img {
@@ -297,6 +533,8 @@
     }
 
     .icon-image img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
 
@@ -439,10 +677,11 @@
     }
 
     .quick-links a svg {
-      width: 1.3rem;
-      height: 1.3rem;
+      width: 1.2rem;
+      height: 1.2rem;
       display: block;
       fill: currentColor;
+      flex-shrink: 0;
     }
 
     .social-link.youtube {
@@ -451,6 +690,14 @@
 
     .social-link.instagram {
       color: #e4405f;
+    }
+
+    .social-link.linkedin {
+      color: #0a66c2;
+    }
+
+    .social-link.x {
+      color: #000000;
     }
 
     .reveal {
@@ -528,6 +775,18 @@
       box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
+    }
+
+    .securevault .panel .panel-logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 220px;
+      max-width: 36%;
+      opacity: 0.95;
+      pointer-events: none;
+      transform: translateZ(0);
+      filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.5));
     }
 
     .securevault .panel::after {
@@ -667,6 +926,201 @@
       }
     }
 
+    .feedback-fab {
+      position: fixed;
+      right: clamp(1rem, 2.4vw, 1.5rem);
+      bottom: clamp(1rem, 2.4vw, 1.5rem);
+      z-index: 1800;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      border: 1px solid rgba(127, 227, 255, 0.24);
+      border-radius: 999px;
+      padding: 0.82rem 1rem;
+      background: rgba(8, 19, 36, 0.72);
+      color: var(--text);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+      cursor: pointer;
+    }
+
+    .feedback-fab:hover,
+    .feedback-fab:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 54px rgba(49, 163, 255, 0.24);
+      border-color: rgba(127, 227, 255, 0.5);
+      outline: none;
+    }
+
+    .feedback-fab__icon {
+      display: inline-grid;
+      place-items: center;
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(49, 163, 255, 0.28), rgba(64, 242, 208, 0.28));
+      color: #dff7ff;
+      font-size: 0.95rem;
+    }
+
+    .survey-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(1, 5, 12, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    .survey-modal-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .survey-modal {
+      width: min(100%, 560px);
+      max-height: min(92vh, 720px);
+      overflow: auto;
+      border-radius: 28px;
+      border: 1px solid rgba(127, 227, 255, 0.18);
+      background: linear-gradient(145deg, rgba(8, 20, 38, 0.96), rgba(6, 15, 29, 0.95));
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      padding: 1.4rem;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 220ms ease;
+    }
+
+    .survey-modal-backdrop.is-open .survey-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .survey-modal__header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.7rem;
+    }
+
+    .survey-modal__close {
+      width: 2.45rem;
+      height: 2.45rem;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(127, 227, 255, 0.12);
+      color: var(--text);
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: inline-grid;
+      place-items: center;
+      transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .survey-modal__close:hover,
+    .survey-modal__close:focus-visible {
+      background: rgba(127, 227, 255, 0.2);
+      transform: rotate(90deg);
+      outline: none;
+    }
+
+    .survey-modal__content {
+      display: grid;
+      gap: 1rem;
+      padding: 0.25rem 0.25rem 0.35rem;
+    }
+
+    .survey-modal__icon {
+      display: inline-flex;
+      width: 3.2rem;
+      height: 3.2rem;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(49, 163, 255, 0.26), rgba(64, 242, 208, 0.24));
+      color: #f4fbff;
+      font-size: 1.25rem;
+      margin-bottom: 0.1rem;
+    }
+
+    .survey-modal__eyebrow {
+      margin: 0 0 0.35rem;
+      color: var(--secondary);
+      font-size: 0.77rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .survey-modal h2 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3.4vw, 1.8rem);
+      line-height: 1.2;
+    }
+
+    .survey-modal__description {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .survey-modal__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .survey-modal__primary,
+    .survey-modal__secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.95rem;
+      padding: 0.8rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      cursor: pointer;
+    }
+
+    .survey-modal__primary {
+      color: #041220;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      box-shadow: 0 12px 30px rgba(64, 242, 208, 0.18);
+    }
+
+    .survey-modal__primary:hover,
+    .survey-modal__primary:focus-visible,
+    .survey-modal__secondary:hover,
+    .survey-modal__secondary:focus-visible {
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .survey-modal__secondary {
+      color: var(--text);
+      border-color: rgba(127, 227, 255, 0.2);
+      background: rgba(127, 227, 255, 0.08);
+    }
+
+    body.survey-modal-open {
+      overflow: hidden;
+    }
+
     @media (max-width: 690px) {
       .hero {
         padding-top: 3.4rem;
@@ -682,10 +1136,93 @@
       .grid {
         grid-template-columns: 1fr;
       }
+
+      .feedback-fab {
+        width: calc(100% - 1.2rem);
+        justify-content: center;
+        right: 0.6rem;
+        left: 0.6rem;
+        bottom: 0.75rem;
+      }
+
+      .survey-modal {
+        padding: 1rem;
+        border-radius: 22px;
+      }
+
+      .survey-modal__actions {
+        flex-direction: column;
+      }
+
+      .survey-modal__primary,
+      .survey-modal__secondary {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 <body>
+  <div
+    id="introOverlay"
+    class="intro-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="intro-title"
+    aria-describedby="intro-desc"
+  >
+    <video
+      id="introVideo"
+      class="intro-video"
+      autoplay
+      muted
+      playsinline
+      webkit-playsinline
+      loop
+      preload="metadata"
+      aria-hidden="true"
+    >
+      <source src="assets/Video%20Project%204.mp4" type="video/mp4" />
+    </video>
+    <div class="intro-panel">
+      <div class="intro-copy">
+        <h1 id="intro-title" class="intro-title">Welcome</h1>
+      </div>
+
+      <div class="intro-actions">
+        <div id="introFallback" class="intro-fallback" aria-live="polite">
+          <button
+            id="playIntroButton"
+            class="intro-button intro-button-primary"
+            type="button"
+            aria-label="Play the intro video"
+          >
+            Play Intro
+          </button>
+        </div>
+
+        <button
+          id="enterWebsiteButton"
+          class="intro-button intro-button-secondary"
+          type="button"
+          aria-label="Enter the website and skip the intro"
+        >
+          Enter Website
+        </button>
+
+        <p id="introStatus" class="intro-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="siteShell" class="site-shell" aria-hidden="true" inert>
   <header class="navbar">
     <div class="container nav-inner">
       <a href="#home" class="brand">Navonmesh Developers</a>
@@ -725,46 +1262,42 @@
           </header>
           <div class="grid grid-3">
             <article class="card reveal">
-              <div class="icon icon-image"><img src="assets/securevault-logo.ico" alt="SecureVault logo" /></div>
+              <div class="icon icon-image"><img src="assets/png.png" alt="SecureVault logo" /></div>
               <h3>SecureVault</h3>
               <p>Powerful app to hide, lock and encrypt files.</p>
               <a class="btn btn-secondary" href="#securevault">View Details</a>
             </article>
-            <article class="card reveal">
-              <div class="icon">BF</div>
-              <h3>Billflow</h3>
-              <p>Billing software to make invoices, manage customers, sales reports and many more.</p>
-              <span class="btn btn-secondary">Coming Soon!</span>
-            </article>
           </div>
         </div>
+        
         <!-- =========================
-     Product Hunt Launch Banner
-========================= -->
-<section class="ph-launch-section">
-    <div class="ph-launch-card">
-        <div class="ph-badge">🚀 NOW LIVE ON PRODUCT HUNT</div>
-
-        <h2>SecureVault is Live on Product Hunt!</h2>
-
-        <p>
-            We are officially launching <strong>SecureVault</strong> on Product Hunt.
-            If you like our mission of making file security simple, we'd love your support.
-            Visit our Product Hunt page to explore SecureVault and share your feedback.
+        Product Hunt Launch Banner
+        ========================= -->
+        <section class="ph-launch-section">
+          <div class="ph-launch-card">
+            <div class="ph-badge">🚀 NOW LIVE ON PRODUCT HUNT</div>
+            
+            <h2>SecureVault is Live on Product Hunt!</h2>
+            
+            <p>
+              We've officially launched <strong>SecureVault</strong> on Product Hunt.
+              We are officially launching <strong>SecureVault</strong> on Product Hunt.
+              If you like our mission of making file security simple, we'd love your support.
+              Visit our Product Hunt page to explore SecureVault and share your feedback.
         </p>
-
+        
         <div class="ph-buttons">
-            <a href="https://www.producthunt.com/products/securevault-hide-encrypt-your-files?utm_source=linkedin&utm_medium=social"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="ph-btn">
+          <a href="https://www.producthunt.com/products/securevault-hide-encrypt-your-files?utm_source=linkedin&utm_medium=social"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="ph-btn">
                 🚀 View on Product Hunt
             </a>
+          </div>
         </div>
-    </div>
-</section>
-
-<style>
+      </section>
+      
+      <style>
 .ph-launch-section{
     padding:70px 20px;
     display:flex;
@@ -841,26 +1374,26 @@
     }
 }
 </style>
-        <!--Yaha tak-->
-      </section>
-    </div>
+</section>
+</div>
+<!--Yaha tak-->
 
-    <section id="about" class="section page">
-      <div class="container">
-        <header class="section-head reveal">
-          <div class="badge">About Our Company</div>
-          <h1>Building and Publishing Our Own Apps</h1>
-          <p class="lead">Navonmesh Developers is a startup focused on creating, launching, and improving self-made apps for real everyday needs.</p>
-        </header>
-
-        <section class="grid grid-2 section">
-          <article class="card reveal">
-            <h2>Our Story</h2>
-            <p>Navonmesh Developers began as a builder-first startup with a simple belief: great apps should be practical, secure, and easy to use.</p>
-            <p>We design, develop, test, publish, and continuously improve our own products with a long-term product mindset.</p>
-          </article>
-          <article class="card reveal">
-            <h2>Mission</h2>
+<section id="about" class="section page">
+  <div class="container">
+    <header class="section-head reveal">
+      <div class="badge">About Our Company</div>
+      <h1>Building and Publishing Our Own Apps</h1>
+      <p class="lead">Navonmesh Developers is a startup focused on creating, launching, and improving self-made apps for real everyday needs.</p>
+    </header>
+    
+    <section class="grid grid-2 section">
+      <article class="card reveal">
+        <h2>Our Story</h2>
+        <p>Navonmesh Developers began as a builder-first startup with a simple belief: great apps should be practical, secure, and easy to use.</p>
+        <p>We design, develop, test, publish, and continuously improve our own products with a long-term product mindset.</p>
+      </article>
+      <article class="card reveal">
+        <h2>Mission</h2>
             <p>To build self-made apps that solve real user problems through thoughtful design, dependable performance, and continuous updates.</p>
             <h3>Vision</h3>
             <p>To become a trusted app startup known for useful products, consistent quality, and user-first innovation.</p>
@@ -907,16 +1440,10 @@
 
         <section class="grid grid-3">
           <article class="card reveal">
-            <div class="icon icon-image"><img src="assets/securevault-logo.ico" alt="SecureVault logo" /></div>
+            <div class="icon icon-image"><img src="assets/png.png" alt="SecureVault logo" /></div>
             <h3>SecureVault</h3>
             <p>Powerful app to hide, lock and encrypt files.</p>
             <a class="btn btn-secondary" href="#securevault">View Details</a>
-          </article>
-          <article class="card reveal">
-            <div class="icon">BF</div>
-            <h3>Billflow</h3>
-            <p>Billing software to make invoices, manage customers, sales reports and many more.</p>
-            <span class="btn btn-secondary">Coming Soon!</span>
           </article>
         </section>
       </div>
@@ -947,6 +1474,7 @@
         <aside class="card reveal">
           <h2>Business Contact</h2>
           <p><strong>Email:</strong> navonmeshdevelopers@gmail.com</p>
+          <p>We typically process requests within 15 business days.</p>
           <h3>Social Media</h3>
           <div class="quick-links">
             <a href="https://www.youtube.com/@official_navonmeshdevelopers" class="social-link youtube" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
@@ -957,6 +1485,16 @@
             <a href="https://www.instagram.com/official_navonmeshdevelopers/" class="social-link instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.25 2.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm-4.25 1.25a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/>
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/in/navonmeshdevelopers" class="social-link linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M6.94 8.5A1.56 1.56 0 1 0 6.94 5.38a1.56 1.56 0 0 0 0 3.12ZM5.38 10.06h3.12v8.12H5.38V10.06Zm4.69 0h2.99v1.11h.04c.42-.8 1.44-1.64 2.96-1.64 3.17 0 3.76 2.08 3.76 4.79v4.86h-3.12v-4.56c0-1.08-.02-2.48-1.51-2.48-1.52 0-1.75 1.18-1.75 2.4v4.64H10.07V10.06Z"/>
+              </svg>
+            </a>
+            <a href="https://x.com/navonmesh_dev" class="social-link x" target="_blank" rel="noopener noreferrer" aria-label="X">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M18.901 1.153h3.68l-8.04 9.19 9.46 12.658h-7.406l-5.8-7.594-6.638 7.594H1.316l8.6-9.823L.2 1.153h7.59l5.243 6.932ZM17.61 20.644h1.016L6.486 3.24H5.43Z"/>
               </svg>
             </a>
           </div>
@@ -992,6 +1530,7 @@
           </div>
 
           <div class="panel reveal">
+            <img src="assets/png.png" alt="SecureVault logo" class="panel-logo" />
             <h2 class="section-title">SecureVault desktop</h2>
             <p class="lead">A local digital safe for Windows 10 and 11 that encrypts, organizes, and lets you view private media and documents without exposing them.</p>
             <div class="grid">
@@ -1072,16 +1611,220 @@
               <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.25 2.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm-4.25 1.25a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/>
             </svg>
           </a>
+          <a href="https://www.linkedin.com/in/navonmeshdevelopers" class="social-link linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6.94 8.5A1.56 1.56 0 1 0 6.94 5.38a1.56 1.56 0 0 0 0 3.12ZM5.38 10.06h3.12v8.12H5.38V10.06Zm4.69 0h2.99v1.11h.04c.42-.8 1.44-1.64 2.96-1.64 3.17 0 3.76 2.08 3.76 4.79v4.86h-3.12v-4.56c0-1.08-.02-2.48-1.51-2.48-1.52 0-1.75 1.18-1.75 2.4v4.64H10.07V10.06Z"/>
+            </svg>
+          </a>
+          <a href="https://x.com/navonmesh_dev" class="social-link x" target="_blank" rel="noopener noreferrer" aria-label="X">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M18.901 1.153h3.68l-8.04 9.19 9.46 12.658h-7.406l-5.8-7.594-6.638 7.594H1.316l8.6-9.823L.2 1.153h7.59l5.243 6.932ZM17.61 20.644h1.016L6.486 3.24H5.43Z"/>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
   </footer>
+  </div>
+
+  <button class="feedback-fab" id="feedbackFab" type="button" aria-haspopup="dialog" aria-controls="surveyModal" aria-label="Share your feedback">
+    <span class="feedback-fab__icon" aria-hidden="true">✦</span>
+    <span>Share Your Thoughts</span>
+  </button>
 
   <script>
     (function () {
+      const root = document.documentElement;
+      const siteShell = document.getElementById('siteShell');
+      const introOverlay = document.getElementById('introOverlay');
+      const introVideo = document.getElementById('introVideo');
+      const enterButton = document.getElementById('enterWebsiteButton');
+      const playButton = document.getElementById('playIntroButton');
+      const fallbackWrap = document.getElementById('introFallback');
+      const introStatus = document.getElementById('introStatus');
+      const introKey = 'navonmesh-intro-seen';
+
       const menuBtn = document.querySelector('.menu-btn');
       const navLinks = document.querySelector('.nav-links');
       const navItems = document.querySelectorAll('.nav-links a');
+
+      let introCleanupTimer = null;
+      let introIsExiting = false;
+
+      function setStatus(message) {
+        if (introStatus) {
+          introStatus.textContent = message || '';
+        }
+      }
+
+      function markIntroSeen() {
+        try {
+          window.localStorage.setItem(introKey, '1');
+        } catch (error) {
+          // Ignore storage failures so the site still works in private mode.
+        }
+      }
+
+      function unlockSite() {
+        if (!siteShell) {
+          return;
+        }
+
+        siteShell.removeAttribute('inert');
+        siteShell.removeAttribute('aria-hidden');
+      }
+
+      function cleanupVideo() {
+        if (!introVideo) {
+          return;
+        }
+
+        introVideo.pause();
+        introVideo.removeAttribute('src');
+        introVideo.querySelectorAll('source').forEach((source) => {
+          source.removeAttribute('src');
+        });
+        introVideo.load();
+      }
+
+      function focusVisibleContent() {
+        const focusTarget =
+          document.querySelector('.page.active h1, .page.active h2, .page.active h3') ||
+          document.querySelector('.page.active .btn') ||
+          document.querySelector('main') ||
+          siteShell;
+
+        if (focusTarget && typeof focusTarget.focus === 'function') {
+          if (!focusTarget.hasAttribute('tabindex')) {
+            focusTarget.setAttribute('tabindex', '-1');
+          }
+
+          focusTarget.focus({ preventScroll: true });
+        }
+      }
+
+      function completeIntro() {
+        if (!introOverlay || root.dataset.intro === 'complete' || introIsExiting) {
+          return;
+        }
+
+        introIsExiting = true;
+        markIntroSeen();
+        root.classList.add('intro-exiting');
+        introOverlay.classList.add('is-hidden');
+        setStatus('Entering website...');
+        unlockSite();
+        window.clearTimeout(introCleanupTimer);
+
+        introCleanupTimer = window.setTimeout(function () {
+          root.dataset.intro = 'complete';
+          root.classList.remove('intro-exiting');
+          document.removeEventListener('keydown', handleKeydown);
+
+          if (introVideo) {
+            introVideo.removeEventListener('ended', completeIntro);
+            introVideo.removeEventListener('error', showFallback);
+          }
+
+          if (introOverlay.parentNode) {
+            introOverlay.remove();
+          }
+
+          cleanupVideo();
+          focusVisibleContent();
+        }, 700);
+      }
+
+      function showFallback() {
+        if (introIsExiting || root.dataset.intro === 'complete') {
+          return;
+        }
+
+        if (fallbackWrap) {
+          fallbackWrap.classList.add('is-visible');
+        }
+
+        setStatus('Autoplay was blocked. Tap Play Intro or Enter Website.');
+
+        if (playButton) {
+          playButton.focus({ preventScroll: true });
+        }
+      }
+
+      function startIntroPlayback() {
+        if (!introVideo) {
+          return Promise.resolve();
+        }
+
+        introVideo.muted = true;
+        introVideo.loop = true;
+        introVideo.playsInline = true;
+
+        if (fallbackWrap) {
+          fallbackWrap.classList.remove('is-visible');
+        }
+
+        setStatus('');
+
+        return introVideo.play().catch(function () {
+          showFallback();
+        });
+      }
+
+      function handleOverlayClick(event) {
+        if (event.target.closest('button')) {
+          return;
+        }
+
+        completeIntro();
+      }
+
+      function handleKeydown(event) {
+        if (event.key === 'Escape' && root.dataset.intro !== 'complete') {
+          event.preventDefault();
+          completeIntro();
+        }
+      }
+
+      if (root.dataset.intro === 'complete') {
+        unlockSite();
+
+        if (introOverlay) {
+          introOverlay.setAttribute('aria-hidden', 'true');
+        }
+      } else {
+        if (siteShell) {
+          siteShell.setAttribute('aria-hidden', 'true');
+          siteShell.setAttribute('inert', '');
+        }
+
+        if (introOverlay) {
+          introOverlay.addEventListener('click', handleOverlayClick);
+        }
+
+        if (enterButton) {
+          enterButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            completeIntro();
+          });
+          enterButton.focus({ preventScroll: true });
+        }
+
+        if (playButton) {
+          playButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            startIntroPlayback();
+          });
+        }
+
+        if (introVideo) {
+          introVideo.addEventListener('ended', completeIntro);
+          introVideo.addEventListener('error', showFallback);
+          startIntroPlayback();
+        }
+
+        document.addEventListener('keydown', handleKeydown);
+      }
 
       if (menuBtn && navLinks) {
         menuBtn.addEventListener('click', function () {
@@ -1146,6 +1889,323 @@
 
       window.addEventListener('hashchange', handleRoute);
       handleRoute();
+
+      const surveyUrl = 'https://forms.gle/vtcraV9wF1wrT2LQ9';
+      const surveyDismissKey = 'navonmesh-survey-dismissed-until';
+      const surveyCompleteKey = 'navonmesh-survey-completed';
+      const feedbackFab = document.getElementById('feedbackFab');
+      let surveyModal = null;
+      let surveyBackdrop = null;
+      let surveyReminderTimer = null;
+      let surveyReminderTriggered = false;
+      let surveyModalOpen = false;
+      let surveyExitIntentTriggered = false;
+
+      function getStoredValue(key) {
+        try {
+          return window.localStorage.getItem(key);
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function setStoredValue(key, value) {
+        try {
+          window.localStorage.setItem(key, value);
+        } catch (error) {
+          // Ignore storage issues so the site remains functional.
+        }
+      }
+
+      function getDismissalDeadline() {
+        const value = Number(getStoredValue(surveyDismissKey));
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      function markSurveyDismissed() {
+        setStoredValue(surveyDismissKey, String(Date.now() + 7 * 24 * 60 * 60 * 1000));
+      }
+
+      function markSurveyCompleted() {
+        setStoredValue(surveyCompleteKey, '1');
+      }
+
+      function hasCompletedSurvey() {
+        return getStoredValue(surveyCompleteKey) === '1';
+      }
+
+      function shouldAutoShowSurvey() {
+        if (hasCompletedSurvey()) {
+          return false;
+        }
+
+        const dismissedUntil = getDismissalDeadline();
+        return Date.now() >= dismissedUntil;
+      }
+
+      function trackSurveyEvent(name, data) {
+        if (window.gtag && typeof window.gtag === 'function') {
+          window.gtag('event', name, data || {});
+          return;
+        }
+
+        if (window.dataLayer && Array.isArray(window.dataLayer)) {
+          window.dataLayer.push({ event: name, ...(data || {}) });
+          return;
+        }
+
+        if (window.analytics && typeof window.analytics.track === 'function') {
+          window.analytics.track(name, data || {});
+        }
+      }
+
+      function createSurveyModal() {
+        if (surveyBackdrop && surveyModal) {
+          return;
+        }
+
+        surveyBackdrop = document.createElement('div');
+        surveyBackdrop.className = 'survey-modal-backdrop';
+        surveyBackdrop.setAttribute('id', 'surveyModal');
+        surveyBackdrop.setAttribute('aria-hidden', 'true');
+
+        const panel = document.createElement('div');
+        panel.className = 'survey-modal';
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-modal', 'true');
+        panel.setAttribute('aria-labelledby', 'surveyModalTitle');
+        panel.setAttribute('aria-describedby', 'surveyModalDescription');
+
+        panel.innerHTML = [
+          '<div class="survey-modal__content">',
+          '  <div class="survey-modal__header">',
+          '    <button class="survey-modal__close" type="button" aria-label="Close feedback survey">×</button>',
+          '  </div>',
+          '  <div class="survey-modal__icon" aria-hidden="true">🚀</div>',
+          '  <p class="survey-modal__eyebrow">Quick Survey</p>',
+          '  <h2 id="surveyModalTitle">Help Us Build Something Better 🚀</h2>',
+          '  <p id="surveyModalDescription" class="survey-modal__description">Your thoughts directly shapes what we\'re building. The survey takes less than 2 minutes, and your insights are incredibly valuable.</p>',
+          '  <div class="survey-modal__actions">',
+          '    <a class="survey-modal__primary" href="' + surveyUrl + '" target="_blank" rel="noopener noreferrer">Take Survey</a>',
+          '    <button class="survey-modal__secondary" type="button">Maybe Later</button>',
+          '  </div>',
+          '</div>'
+        ].join('');
+
+        surveyBackdrop.appendChild(panel);
+        document.body.appendChild(surveyBackdrop);
+        surveyModal = panel;
+
+        const closeButton = panel.querySelector('.survey-modal__close');
+        const laterButton = panel.querySelector('.survey-modal__secondary');
+
+        if (closeButton) {
+          closeButton.addEventListener('click', function () {
+            closeSurveyModal('x-button');
+          });
+        }
+
+        if (laterButton) {
+          laterButton.addEventListener('click', function () {
+            markSurveyDismissed();
+            trackSurveyEvent('Survey Dismissed', { reason: 'later-button' });
+            closeSurveyModal('later-button');
+          });
+        }
+
+        surveyBackdrop.addEventListener('click', function (event) {
+          if (event.target === surveyBackdrop) {
+            markSurveyDismissed();
+            trackSurveyEvent('Survey Dismissed', { reason: 'backdrop' });
+            closeSurveyModal('backdrop');
+          }
+        });
+      }
+
+      function focusSurveyModal() {
+        if (!surveyModal) {
+          return;
+        }
+
+        const focusable = surveyModal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        const firstFocusable = focusable[0];
+        const lastFocusable = focusable[focusable.length - 1];
+
+        if (firstFocusable) {
+          firstFocusable.focus({ preventScroll: true });
+        }
+
+        if (firstFocusable && lastFocusable && firstFocusable === lastFocusable) {
+          return;
+        }
+
+        surveyModal.addEventListener('keydown', handleSurveyKeydown);
+        if (firstFocusable) {
+          firstFocusable.focus({ preventScroll: true });
+        }
+      }
+
+      function handleSurveyKeydown(event) {
+        if (!surveyModal || !surveyBackdrop || !surveyBackdrop.classList.contains('is-open')) {
+          return;
+        }
+
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          markSurveyDismissed();
+          trackSurveyEvent('Survey Dismissed', { reason: 'escape' });
+          closeSurveyModal('escape');
+          return;
+        }
+
+        if (event.key !== 'Tab') {
+          return;
+        }
+
+        const focusable = surveyModal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (!focusable.length) {
+          event.preventDefault();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      function closeSurveyModal(reason) {
+        if (!surveyBackdrop || !surveyBackdrop.classList.contains('is-open')) {
+          return;
+        }
+
+        surveyBackdrop.classList.remove('is-open');
+        surveyBackdrop.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('survey-modal-open');
+        surveyModalOpen = false;
+        surveyModal?.removeEventListener('keydown', handleSurveyKeydown);
+
+        window.setTimeout(function () {
+          if (surveyBackdrop && surveyBackdrop.parentNode) {
+            surveyBackdrop.remove();
+          }
+          surveyBackdrop = null;
+          surveyModal = null;
+        }, 220);
+
+        if (reason !== 'completed') {
+          trackSurveyEvent('Survey Dismissed', { reason: reason || 'dismiss' });
+        }
+      }
+
+      function openSurveyModal(reason) {
+        if (surveyModalOpen) {
+          return;
+        }
+
+        if (reason !== 'button' && !shouldAutoShowSurvey()) {
+          return;
+        }
+
+        createSurveyModal();
+        surveyBackdrop.classList.add('is-open');
+        surveyBackdrop.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('survey-modal-open');
+        surveyModalOpen = true;
+        focusSurveyModal();
+        trackSurveyEvent('Survey Modal Opened', { reason: reason || 'prompt' });
+      }
+
+      function startSurvey() {
+        markSurveyCompleted();
+        trackSurveyEvent('Survey Started');
+        window.open(surveyUrl, '_blank', 'noopener,noreferrer');
+        closeSurveyModal('completed');
+      }
+
+      if (feedbackFab) {
+        feedbackFab.addEventListener('click', function () {
+          openSurveyModal('button');
+        });
+      }
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && surveyBackdrop && surveyBackdrop.classList.contains('is-open')) {
+          event.preventDefault();
+          markSurveyDismissed();
+          closeSurveyModal('escape');
+        }
+      });
+
+      function scheduleSurveyReminder() {
+        if (surveyReminderTriggered || hasCompletedSurvey()) {
+          return;
+        }
+
+        const timerLength = 45000 + Math.floor(Math.random() * 15001);
+        surveyReminderTimer = window.setTimeout(function () {
+          surveyReminderTriggered = true;
+          openSurveyModal('timer');
+          trackSurveyEvent('Survey Reminder Triggered', { reason: 'timer' });
+        }, timerLength);
+      }
+
+      function handleScrollDepth() {
+        if (surveyReminderTriggered || hasCompletedSurvey()) {
+          return;
+        }
+
+        const scrollTop = window.scrollY || window.pageYOffset || 0;
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const depth = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+
+        if (depth >= 0.7) {
+          surveyReminderTriggered = true;
+          if (surveyReminderTimer) {
+            window.clearTimeout(surveyReminderTimer);
+          }
+          openSurveyModal('scroll');
+          trackSurveyEvent('Survey Reminder Triggered', { reason: 'scroll' });
+        }
+      }
+
+      function handleExitIntent(event) {
+        if (surveyReminderTriggered || surveyExitIntentTriggered || hasCompletedSurvey()) {
+          return;
+        }
+
+        const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const isTopExit = event.clientY <= 0 || event.clientY <= 24;
+
+        if (!isDesktop || !isTopExit) {
+          return;
+        }
+
+        surveyExitIntentTriggered = true;
+        openSurveyModal('exit-intent');
+        trackSurveyEvent('Exit Intent Triggered');
+      }
+
+      window.addEventListener('load', function () {
+        scheduleSurveyReminder();
+      });
+
+      window.addEventListener('scroll', handleScrollDepth, { passive: true });
+      document.addEventListener('mouseout', handleExitIntent);
+
+      const surveyPrimaryAction = document.querySelector('.survey-modal__primary');
+      if (surveyPrimaryAction) {
+        surveyPrimaryAction.addEventListener('click', function (event) {
+          event.preventDefault();
+          startSurvey();
+        });
+      }
     })();
   </script>
 </body>
